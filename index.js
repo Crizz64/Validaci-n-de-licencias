@@ -50,7 +50,6 @@ app.post("/patente", (req, res) => {
 
 app.post("/pedido", (req, res) => {
   // let data = req.body.inputs; // Removed as it is unused
-  let pedido = req.body.inputs?.pedido;
   let pedido = req.body.inputs.pedido;
 
   //Mostrar en consola
