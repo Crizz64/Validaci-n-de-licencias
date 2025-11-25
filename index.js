@@ -277,20 +277,20 @@ app.post("/enviar-archivo", (_, res) => {
 // ----------------------------------------------------
 app.post("/licencia", (req, res) => {
   try {
-    if (!req.body?.licencia) {
+    // Busca la licencia en los dos posibles nodos
+    const licencia = req.body.inputs?.licencia
+                    || req.body.chat?.contacto?.licencia;
+
+    if (!licencia) {
       throw new Error('El campo "licencia" es obligatorio');
     }
 
-    const licencia = req.body.licencia.toString().toLowerCase();
+    const texto = licencia.toString().toLowerCase() === "1234"
+      ? "Reservaremos tu cupo"
+      : "Lo sentimos tu licencia parece estar vencida";
 
     const actions = [
-      {
-        type: "sendText",
-        text:
-          licencia === "1234"
-            ? "Reservaremos tu cupo"
-            : "Lo sentimos tu licencia parece estar vencida",
-      },
+      { type: "sendText", text: texto },
       {
         type: "sendFile",
         url: "https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf",
@@ -305,9 +305,4 @@ app.post("/licencia", (req, res) => {
       error: error.message,
     });
   }
-});
-
-// ----------------------------------------------------
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
 });
