@@ -1,8 +1,9 @@
-const express = require("express");
-const request = require("request");
+import express from "express";
+import request from "request";
 const app = express();
 const port = 3000;
 
+// Middleware para parsear JSON (debe ir antes de los routes)
 app.use(express.json());
 app.post("/patente", (req, res) => {
   let data = req.body;
@@ -48,8 +49,8 @@ app.post("/patente", (req, res) => {
 });
 
 app.post("/pedido", (req, res) => {
-  let data = req.body.inputs;
-  let respuestaCliente = req.body.userInput;
+  // let data = req.body.inputs; // Removed as it is unused
+  let pedido = req.body.inputs?.pedido;
   let pedido = req.body.inputs.pedido;
 
   //Mostrar en consola
@@ -203,8 +204,7 @@ app.post("/data-historial", (req, res) => {
     url: "https://api.liveconnect.chat/prod/history/messages",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
-      PageGearToken:
+      PageGearToken: process.env.PAGE_GEAR_TOKEN,
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjX2tleSI6IjI0MDc3MmNhNmUzYmE4OWI3YmMxNzU4OWY0MDVkMmY2IiwiaWRfcGdlIjo0MjEsImlkX2N1ZW50YSI6MjE1MCwibm9tYnJlIjoiTGl2ZUNvbm5lY3TCriAoRGVtbykiLCJpYXQiOjE3MjY2NjQ4MTYsImV4cCI6MTcyNjY5MzYxNn0.TOCnD7vdUQgzSZEaYatJAIUIXNsV4vE2uccmvA583J0",
     },
     body: { id_conversacion: idConversacion }, // Enviamos el id en el cuerpo
@@ -212,7 +212,7 @@ app.post("/data-historial", (req, res) => {
   };
 
   // Hacer la solicitud a la API
-  request(options, function (error, response, body) {
+  request(options, function (error, _, body) { // Replaced 'response' with '_'
     if (error) {
       console.error("Error en la petición a la API:", error);
       return res.status(500).json({ error: "Error en la petición a la API" });
@@ -254,7 +254,7 @@ app.post("/data-historial", (req, res) => {
 app.post("/intranet", (req, res) => {
   let data = req.body.inputs;
   let answer = req.body.userInput;
-  let documento = data.num_documento;
+  let documento = data?.num_documento;
 
   //Mostrar en consola
   console.log("Los datos son: ", data);
@@ -299,7 +299,7 @@ app.post("/intranet", (req, res) => {
   }
 });
 
-app.post("/enviar-archivo", (req, res) => {
+app.post("/enviar-archivo", (_, res) => { // Replaced 'req' with '_'
   res.json({
     status: 1,
     status_message: "Ok",
@@ -320,7 +320,7 @@ app.post("/enviar-archivo", (req, res) => {
 
 
 // Middleware para parsear JSON (debe ir antes de los routes)
-app.use(express.json())
+// Removed duplicate middleware
 
 app.post('/validar-licencia', (req, res) => {
   try {
