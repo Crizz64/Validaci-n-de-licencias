@@ -1,7 +1,7 @@
 import express from "express";
 // import fetch from "node-fetch";   // descomenta si usas node‑fetch
 const app = express();
-const port = 3000;
+const port = 3004;
 
 // Middleware para parsear JSON (solo una vez)
 app.use(express.json());
@@ -275,7 +275,7 @@ app.post("/enviar-archivo", (_, res) => {
 // ----------------------------------------------------
 //  /validar-licencia
 // ----------------------------------------------------
-app.post("/validar-licencia", (req, res) => {
+app.post("/licencia", (req, res) => {
   try {
     if (!req.body?.licencia) {
       throw new Error('El campo "licencia" es obligatorio');
