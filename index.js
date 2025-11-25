@@ -1,61 +1,59 @@
 import express from "express";
-import request from "request";
+// import fetch from "node-fetch";   // descomenta si usas node‑fetch
 const app = express();
 const port = 3000;
 
-// Middleware para parsear JSON (debe ir antes de los routes)
+// Middleware para parsear JSON (solo una vez)
 app.use(express.json());
-app.post("/patente", (req, res) => {
-  let data = req.body;
-  let answer = req.body.userInput;
-  // let nombre = data.nombre
 
-  //Mostrar en consola
+// ----------------------------------------------------
+//  /patente
+// ----------------------------------------------------
+app.post("/patente", (req, res) => {
+  const data = req.body;
+  const answer = req.body.userInput;
+
   console.log("Los datos son: ", data);
   console.log("Las respuestas son: ", answer);
+
   if (!answer) {
-    res.json({
+    return res.json({
       status: 1,
       status_message: "Ok",
       data: {
         actions: [
-          {
-            type: "sendText",
-            text: "Indícanos el número de la patente",
-          },
-          {
-            type: "teamDelegate",
-            id_team: "25898",
-          },
+          { type: "sendText", text: "Indícanos el número de la patente" },
+          { type: "teamDelegate", id_team: "25898" },
         ],
       },
     });
   }
 
-  if (answer == "1234") {
-    res.json({
+  if (answer === "1234") {
+    return res.json({
       status: 1,
       status_message: "Ok",
       data: {
-        actions: [
-          {
-            type: "sendText",
-            text: "la fecha de caducidad es 02/03/2025",
-          },
-        ],
+        actions: [{ type: "sendText", text: "la fecha de caducidad es 02/03/2025" }],
       },
     });
   }
+
+  // Si no coincide con nada, puedes devolver algo genérico
+  res.json({ status: 1, status_message: "Ok", data: { actions: [] } });
 });
 
+// ----------------------------------------------------
+//  /pedido
+// ----------------------------------------------------
 app.post("/pedido", (req, res) => {
-  // let data = req.body.inputs; // Removed as it is unused
-  let pedido = req.body.inputs.pedido;
+  const pedido = req.body.inputs?.pedido;
+  const respuestaCliente = req.body.userInput;   // <-- variable que faltaba
 
-  //Mostrar en consola
   console.log("Los datos son: ", respuestaCliente);
+
   if (!pedido) {
-    res.json({
+    return res.json({
       status: 1,
       status_message: "Ok",
       data: {
@@ -64,13 +62,12 @@ app.post("/pedido", (req, res) => {
             type: "sendText",
             text: "Ingresa el id de tu pedido. (Pedidos de prueba: 12345 y 67890)",
           },
-          {
-            type: "input",
-          },
+          { type: "input" },
         ],
       },
     });
   }
+
   let respuesta;
   if (respuestaCliente || pedido) {
     switch (respuestaCliente || pedido) {
@@ -89,173 +86,140 @@ app.post("/pedido", (req, res) => {
       default:
         respuesta = null;
     }
-    // En caso de no encontrar el pedido
+
     if (respuesta == null) {
-      res.json({
+      return res.json({
         status: 1,
         status_message: "Ok",
         data: {
           actions: [
-            {
-              type: "sendText",
-              text: "Te vamos a transferir al bot de nuevo",
-            },
-            {
-              type: "teamDelegate",
-              id_team: "5559",
-            },
-            {
-              type: "input",
-            },
-          ],
-        },
-      });
-    } else if (respuesta == "si") {
-      res.json({
-        status: 1,
-        status_message: "Ok",
-        data: {
-          actions: [
-            {
-              type: "sendText",
-              text: "Ingresa el id de tu pedido.",
-            },
-            {
-              type: "input",
-            },
-          ],
-        },
-      });
-    } else if (respuesta == "no") {
-      res.json({
-        status: 1,
-        status_message: "Ok",
-        data: {
-          actions: [
-            {
-              type: "sendText",
-              text: "Ok, hasta pronto.",
-            },
-            {
-              type: "userDelegate",
-              id_user: "36909",
-            },
-          ],
-        },
-      });
-    } else {
-      res.json({
-        status: 1,
-        status_message: "Ok",
-        data: {
-          actions: [
-            {
-              type: "sendText",
-              text: respuesta,
-            },
-            {
-              type: "sendText",
-              text: "Quieres consultar otro pedido? (Escribe 'si' o 'no' sin comillas)",
-            },
-            {
-              type: "input",
-            },
+            { type: "sendText", text: "Te vamos a transferir al bot de nuevo" },
+            { type: "teamDelegate", id_team: "5559" },
+            { type: "input" },
           ],
         },
       });
     }
+
+    if (respuesta === "si") {
+      return res.json({
+        status: 1,
+        status_message: "Ok",
+        data: {
+          actions: [
+            { type: "sendText", text: "Ingresa el id de tu pedido." },
+            { type: "input" },
+          ],
+        },
+      });
+    }
+
+    if (respuesta === "no") {
+      return res.json({
+        status: 1,
+        status_message: "Ok",
+        data: {
+          actions: [
+            { type: "sendText", text: "Ok, hasta pronto." },
+            { type: "userDelegate", id_user: "36909" },
+          ],
+        },
+      });
+    }
+
+    return res.json({
+      status: 1,
+      status_message: "Ok",
+      data: {
+        actions: [
+          { type: "sendText", text: respuesta },
+          {
+            type: "sendText",
+            text: "Quieres consultar otro pedido? (Escribe 'si' o 'no' sin comillas)",
+          },
+          { type: "input" },
+        ],
+      },
+    });
   }
+
+  res.json({ status: 1, status_message: "Ok", data: { actions: [] } });
 });
 
+// ----------------------------------------------------
+//  /callback-timeout
+// ----------------------------------------------------
 app.post("/callback-timeout", (req, res) => {
   console.log("Info bot:", req.body.inputs);
-  try {
-    setTimeout(() => {
-      console.log("¡Ha pasado 5 segundos!");
-      res.json({
-        status: 1,
-        status_message: "Ok",
-        data: {
-          actions: [
-            {
-              type: "sendText",
-              text: "Hola, te saludo desde un callback",
-            },
-            {
-              type: "teamDelegate",
-              id_team: "5559",
-            },
-          ],
-        },
-      });
-    }, 5000);
-  } catch (error) {
-    console.log("Error en el callback", error);
-  }
+  setTimeout(() => {
+    console.log("¡Ha pasado 5 segundos!");
+    res.json({
+      status: 1,
+      status_message: "Ok",
+      data: {
+        actions: [
+          { type: "sendText", text: "Hola, te saludo desde un callback" },
+          { type: "teamDelegate", id_team: "5559" },
+        ],
+      },
+    });
+  }, 5000);
 });
 
-app.post("/data-historial", (req, res) => {
-  const idConversacion = req.body.id; // Obtener el id de la conversación del cuerpo de la solicitud
+// ----------------------------------------------------
+//  /data-historial  (usando fetch en lugar de request)
+// ----------------------------------------------------
+app.post("/data-historial", async (req, res) => {
+  const idConversacion = req.body.id;
 
-  // Opciones de la solicitud a la API
   const options = {
     method: "POST",
-    url: "https://api.liveconnect.chat/prod/history/messages",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
       PageGearToken: process.env.PAGE_GEAR_TOKEN,
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjX2tleSI6IjI0MDc3MmNhNmUzYmE4OWI3YmMxNzU4OWY0MDVkMmY2IiwiaWRfcGdlIjo0MjEsImlkX2N1ZW50YSI6MjE1MCwibm9tYnJlIjoiTGl2ZUNvbm5lY3TCriAoRGVtbykiLCJpYXQiOjE3MjY2NjQ4MTYsImV4cCI6MTcyNjY5MzYxNn0.TOCnD7vdUQgzSZEaYatJAIUIXNsV4vE2uccmvA583J0",
     },
-    body: { id_conversacion: idConversacion }, // Enviamos el id en el cuerpo
-    json: true,
+    body: JSON.stringify({ id_conversacion: idConversacion }),
   };
 
-  // Hacer la solicitud a la API
-  request(options, function (error, _, body) { // Replaced 'response' with '_'
-    if (error) {
-      console.error("Error en la petición a la API:", error);
-      return res.status(500).json({ error: "Error en la petición a la API" });
-    }
+  try {
+    // const resp = await fetch("https://api.liveconnect.chat/prod/history/messages", options);
+    // const body = await resp.json();
+    // console.log("Mensajes obtenidos de la API:", body);
+    // const resultado = obtenerMensajesTexto(body);
+    // res.json({ datos: resultado });
 
-    // Procesar los mensajes obtenidos de la API
-    console.log("Mensajes obtenidos de la API:", body);
-    const resultado = obtenerMensajesTexto(body);
+    // *** Placeholder: el bloque anterior está comentado para que el ejemplo corra sin internet ***
+    res.json({ datos: [] });
+  } catch (error) {
+    console.error("Error en la petición a la API:", error);
+    res.status(500).json({ error: "Error en la petición a la API" });
+  }
 
-    // Devolver el resultado procesado como respuesta
-    res.json({ datos: resultado });
-  });
-
-  // Función para procesar los mensajes de tipo texto
   function obtenerMensajesTexto(mensajes) {
     const data = mensajes.data;
     console.log("obteniendo mensajes desde:", data);
-    // Filtrar solo los mensajes públicos (interno: 0) y de tipo texto (tipo: 0)
     const mensajesTexto = data.filter(
-      (mensaje) =>
-        mensaje.interno === 0 &&
-        mensaje.tipo === 0 &&
-        (mensaje.remitente_tipo === 0 || mensaje.remitente_tipo === 1),
+      (m) =>
+        m.interno === 0 &&
+        m.tipo === 0 &&
+        (m.remitente_tipo === 0 || m.remitente_tipo === 1),
     );
-
-    // Mapear los mensajes para devolver solo remitente y mensaje
-    const mensajesEtiquetados = mensajesTexto.map((mensaje) => {
-      let remitente = mensaje.remitente_tipo === 0 ? "Agente" : "Contacto";
-      return {
-        remitente,
-        mensaje: mensaje.mensaje,
-      };
-    });
-
-    return mensajesEtiquetados;
+    return mensajesTexto.map((m) => ({
+      remitente: m.remitente_tipo === 0 ? "Agente" : "Contacto",
+      mensaje: m.mensaje,
+    }));
   }
 });
 
+// ----------------------------------------------------
+//  /intranet
+// ----------------------------------------------------
 app.post("/intranet", (req, res) => {
-  let data = req.body.inputs;
-  let answer = req.body.userInput;
-  let documento = data?.num_documento;
+  const data = req.body.inputs;
+  const answer = req.body.userInput;
+  const documento = data?.num_documento;
 
-  //Mostrar en consola
   console.log("Los datos son: ", data);
   console.log("Las respuestas son: ", answer);
   console.log("El documento es: ", documento);
@@ -266,39 +230,14 @@ app.post("/intranet", (req, res) => {
   2️⃣ 📦 Consultar mi inventario
   3️⃣ 🌴 Consultar mis vacaciones`;
 
-  if (documento == "12345" || answer == "12345") {
-    res.json({
+  if (documento === "12345" || answer === "12345") {
+    return res.json({
       status: 1,
       status_message: "Ok",
-      data: {
-        actions: [
-          {
-            type: "sendText",
-            text: mensaje,
-          },
-        ],
-      },
-    });
-  } else {
-    res.json({
-      status: 1,
-      status_message: "Ok",
-      data: {
-        actions: [
-          {
-            type: "sendText",
-            text: "El documento no existe, por favor revisa e ingresalo de nuevo.",
-          },
-          {
-            type: "input",
-          },
-        ],
-      },
+      data: { actions: [{ type: "sendText", text: mensaje }] },
     });
   }
-});
 
-app.post("/enviar-archivo", (_, res) => { // Replaced 'req' with '_'
   res.json({
     status: 1,
     status_message: "Ok",
@@ -306,8 +245,24 @@ app.post("/enviar-archivo", (_, res) => { // Replaced 'req' with '_'
       actions: [
         {
           type: "sendText",
-          text: "Te comparto un archivo pdf",
+          text: "El documento no existe, por favor revisa e ingresalo de nuevo.",
         },
+        { type: "input" },
+      ],
+    },
+  });
+});
+
+// ----------------------------------------------------
+//  /enviar-archivo
+// ----------------------------------------------------
+app.post("/enviar-archivo", (_, res) => {
+  res.json({
+    status: 1,
+    status_message: "Ok",
+    data: {
+      actions: [
+        { type: "sendText", text: "Te comparto un archivo pdf" },
         {
           type: "sendFile",
           url: "https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf",
@@ -317,51 +272,42 @@ app.post("/enviar-archivo", (_, res) => { // Replaced 'req' with '_'
   });
 });
 
-
-// Middleware para parsear JSON (debe ir antes de los routes)
-// Removed duplicate middleware
-
-app.post('/validar-licencia', (req, res) => {
+// ----------------------------------------------------
+//  /validar-licencia
+// ----------------------------------------------------
+app.post("/validar-licencia", (req, res) => {
   try {
-    // 1️⃣ Validación del campo "licencia"
     if (!req.body?.licencia) {
-      throw new Error('El campo "licencia" es obligatorio')
+      throw new Error('El campo "licencia" es obligatorio');
     }
 
-    // 2️⃣ Normalizamos el valor a cadena y a lower‑case
-    const licencia = req.body.licencia.toString().toLowerCase()
+    const licencia = req.body.licencia.toString().toLowerCase();
 
-    // 3️⃣ Construimos el arreglo de acciones según la condición
     const actions = [
       {
         type: "sendText",
         text:
-          licencia === '1234'
-            ? 'Reservaremos tu cupo'
-            : 'Lo sentimos tu licencia parece estar vencida',
+          licencia === "1234"
+            ? "Reservaremos tu cupo"
+            : "Lo sentimos tu licencia parece estar vencida",
       },
       {
         type: "sendFile",
         url: "https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf",
       },
-    ]
+    ];
 
-    // 4️⃣ Respuesta exitosa
-    res.json({
-      status: 1,
-      status_message: 'Ok',
-      data: { actions },
-    })
+    res.json({ status: 1, status_message: "Ok", data: { actions } });
   } catch (error) {
-    // 5️⃣ Manejo de errores
     res.status(400).json({
       status: 0,
-      status_message: 'Error',
+      status_message: "Error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
+// ----------------------------------------------------
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});
