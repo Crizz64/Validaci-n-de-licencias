@@ -318,54 +318,51 @@ app.post("/enviar-archivo", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
 
-// Middleware para parsear JSON
-app.use(express.json());
+// Middleware para parsear JSON (debe ir antes de los routes)
+app.use(express.json())
 
-app.post("/validar-licencia", (req, res) => {
+app.post('/validar-licencia', (req, res) => {
   try {
-    // 1️⃣ Validación del campo "numero"
-    if (!req.body.numero) {
-      throw new Error('El campo "numero" es obligatorio');
+    // 1️⃣ Validación del campo "licencia"
+    if (!req.body?.licencia) {
+      throw new Error('El campo "licencia" es obligatorio')
     }
 
     // 2️⃣ Normalizamos el valor a cadena y a lower‑case
-    const licencia = licencia.toString().toLowerCase();
+    const licencia = req.body.licencia.toString().toLowerCase()
 
     // 3️⃣ Construimos el arreglo de acciones según la condición
     const actions = [
       {
-        type: "sendText",
+        type: 'sendText',
         text:
-          numero === "1234"
-            ? "Reservaremos tu cupo"
-            : "Lo sentimos tu licencia parece estar vencida",
+          licencia === '1234'
+            ? 'Reservaremos tu cupo'
+            : 'Lo sentimos tu licencia parece estar vencida',
       },
       {
-        type: "sendFile",
-        url: "https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf",
+        type: 'sendFile',
+        url: 'https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf',
       },
-    ];
+    ]
 
     // 4️⃣ Respuesta exitosa
     res.json({
       status: 1,
-      status_message: "Ok",
+      status_message: 'Ok',
       data: { actions },
-    });
+    })
   } catch (error) {
     // 5️⃣ Manejo de errores
     res.status(400).json({
       status: 0,
-      status_message: "Error",
+      status_message: 'Error',
       error: error.message,
-    });
+    })
   }
-});
+})
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+  console.log(`Example app listening on port ${port}`)
+})
