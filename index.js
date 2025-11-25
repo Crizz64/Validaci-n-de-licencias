@@ -335,15 +335,15 @@ app.post('/validar-licencia', (req, res) => {
     // 3️⃣ Construimos el arreglo de acciones según la condición
     const actions = [
       {
-        type: 'sendText',
+        type: "sendText",
         text:
           licencia === '1234'
             ? 'Reservaremos tu cupo'
             : 'Lo sentimos tu licencia parece estar vencida',
       },
       {
-        type: 'sendFile',
-        url: 'https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf',
+        type: "sendFile",
+        url: "https://cdn.liveconnect.chat/421/lc/2/biblioteca/1815/60739/manual_de_conexion_canales_whatsapp_api_cloud_actualizado_ene25.pdf",
       },
     ]
 
