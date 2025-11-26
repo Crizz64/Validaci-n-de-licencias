@@ -1,7 +1,8 @@
-import express from "express";
-// import fetch from "node-fetch";   // descomenta si usas node‑fetch
-const app = express();
-const port = 3000;
+  import express from "express";
+  import request from "request";
+  // import fetch from "node-fetch";   // descomenta si usas node‑fetch
+  const app = express();
+  const port = 3000;
 
 // Middleware para parsear JSON (solo una vez)
 app.use(express.json());
