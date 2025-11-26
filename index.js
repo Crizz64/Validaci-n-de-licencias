@@ -13,7 +13,7 @@ app.use(express.json());
 app.post("/patente", (req, res) => {
   const data = req.body;
   const answer = req.body.userInput;
-
+  
   console.log("Los datos son: ", data);
   console.log("Las respuestas son: ", answer);
 
