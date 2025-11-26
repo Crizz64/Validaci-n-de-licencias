@@ -1,12 +1,29 @@
 {
   "name": "validacion-de-licencias",
   "version": "1.0.0",
-  "description": "",
+  "description": "Validación de licencias para el proyecto XYZ",
   "main": "index.js",
   "type": "module",
+  "private": true,
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "licencia",
+    "validación",
+    "express"
+  ],
+  "author": "Tu Nombre <tu.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/validacion-de-licencias.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/validacion-de-licencias/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/validacion-de-licencias#readme",
   "dependencies": {
     "express": "^4.18.2"
   },
@@ -15,7 +32,6 @@
     "node": ">=14.0.0"
   },
   "os": [
-    "darwin",
     "linux",
     "win32"
   ],
